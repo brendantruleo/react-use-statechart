@@ -1,0 +1,32 @@
+{
+  "name": "@corey.burrows/react-use-statechart",
+  "version": "0.1.0",
+  "description": "A React hook for using a statechart to manage a component's state",
+  "main": "build/umd/useStatechart.js",
+  "module": "build/es/useStatechart.js",
+  "types": "build/types/useStatechart.d.ts",
+  "files": ["package.json", "/build"],
+  "dependencies": {},
+  "peerDependencies": {
+    "@corey.burrows/statechart": "^0.1.0",
+    "react": "^16.8.0 || ^17.0.0"
+  },
+  "devDependencies": {
+    "@types/react": "^17.0.39",
+    "typescript": "^4.5.5"
+  },
+  "scripts": {
+    "build": "npx tsc && npx tsc -p ./tsconfig.umd.json",
+    "clean": "rm -rf ./build",
+    "prepare": "npm run clean && npm run build",
+    "postpublish": "git tag v$(npm --loglevel silent run version) && git push --tags",
+    "version": "node -pe \"require('./package.json').version\""
+  },
+  "keywords": [
+    "react",
+    "statechart",
+    "useStatechart"
+  ],
+  "author": "Corey Burrows <corey.burrows@gmail.com>",
+  "license": "MIT"
+}
