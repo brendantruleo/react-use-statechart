@@ -39,5 +39,6 @@
     "useStatechart"
   ],
   "author": "Corey Burrows <corey.burrows@gmail.com>",
-  "license": "MIT"
+  "license": "MIT",
+  "homepage": "https://github.com/burrows/react-use-statechart"
 }
