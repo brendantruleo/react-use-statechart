@@ -5,19 +5,28 @@
   "main": "build/umd/useStatechart.js",
   "module": "build/es/useStatechart.js",
   "types": "build/types/useStatechart.d.ts",
-  "files": ["package.json", "/build"],
+  "files": [
+    "package.json",
+    "/build"
+  ],
   "dependencies": {},
   "peerDependencies": {
     "@corey.burrows/statechart": "^0.1.0",
     "react": "^16.8.0 || ^17.0.0"
   },
   "devDependencies": {
+    "@corey.burrows/statechart": "^0.1.0",
     "@types/react": "^17.0.39",
+    "@types/react-dom": "^17.0.13",
+    "parcel": "^2.3.2",
+    "react": "^17.0.2",
+    "react-dom": "^17.0.2",
     "typescript": "^4.5.5"
   },
   "scripts": {
     "build": "npx tsc && npx tsc -p ./tsconfig.umd.json",
     "clean": "rm -rf ./build",
+    "examples": "npx parcel --dist-dir .parcel examples/index.html",
     "prepare": "npm run clean && npm run build",
     "postpublish": "git tag v$(npm --loglevel silent run version) && git push --tags",
     "version": "node -pe \"require('./package.json').version\""
