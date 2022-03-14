@@ -1,6 +1,6 @@
 {
   "name": "@corey.burrows/react-use-statechart",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "A React hook for using a statechart to manage a component's state",
   "main": "build/umd/useStatechart.js",
   "module": "build/es/useStatechart.js",
