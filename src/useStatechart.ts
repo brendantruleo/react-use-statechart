@@ -1,13 +1,41 @@
-import {useCallback, useEffect, useState} from 'react';
+import {useCallback, useEffect, useRef, useState} from 'react';
 import Statechart, {Event, State, SendFn} from '@corey.burrows/statechart';
+
+export interface UseStatechartOpts {
+  trace?: boolean;
+  inspect?: boolean;
+  clear?: boolean;
+}
+
+const inspect = (
+  statechart: Statechart<any, any>,
+  state: State<any, any>,
+): void => {
+  console.info(statechart.inspect(state));
+};
+
+const trace = (
+  event: Event | null,
+  from: State<any, any> | null,
+  to: State<any, any>,
+): void => {
+  const e = event ? event.type : '__init__';
+  const f = from ? JSON.stringify(from.current.map(n => n.path)) : '(null)';
+  const t = JSON.stringify(to.current.map(n => n.path));
+  console.info(`[${e}]: ${f} -> ${t}`);
+};
 
 const useStatechart = <C, E extends Event>(
   statechart: Statechart<C, E>,
+  opts: UseStatechartOpts = {},
 ): [State<C, E>, SendFn<E>] => {
   const [state, setState] = useState(statechart.initialState);
+  const eventRef = useRef<Event | null>(null);
+  const prevStateRef = useRef<State<any, any> | null>(null);
 
   const send = useCallback(
     (evt: E): void => {
+      eventRef.current = evt;
       setState(state => statechart.send(state, evt));
     },
     [setState],
@@ -23,6 +51,12 @@ const useStatechart = <C, E extends Event>(
         a(send);
       }
     });
+
+    if (opts.clear) console.clear();
+    if (opts.trace) trace(eventRef.current, prevStateRef.current, state);
+    if (opts.inspect) inspect(statechart, state);
+
+    prevStateRef.current = state;
   }, [state]);
 
   return [state, send];

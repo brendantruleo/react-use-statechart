@@ -17,7 +17,7 @@ const toggle = new Statechart<{}, Evt>({}, s => {
 interface AppProps {}
 
 const App: React.FC<AppProps> = ({}) => {
-  const [state, send] = useStatechart(toggle);
+  const [state, send] = useStatechart(toggle, {trace: true, inspect: true});
 
   return (
     <div>
