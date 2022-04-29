@@ -31,7 +31,7 @@ const useStatechart = <C, E extends Event>(
 ): [State<C, E>, SendFn<E>] => {
   const [state, setState] = useState(statechart.initialState);
   const eventRef = useRef<Event | null>(null);
-  const prevStateRef = useRef<State<any, any> | null>(null);
+  const stateRef = useRef<State<any, any> | null>(null);
 
   const send = useCallback(
     (evt: E): void => {
@@ -40,6 +40,22 @@ const useStatechart = <C, E extends Event>(
     },
     [setState],
   );
+
+  useEffect(() => {
+    return () => {
+      if (stateRef.current) {
+        const nextState = statechart.stop(stateRef.current);
+        nextState.activities.stop.forEach(a => a.stop());
+        nextState.actions.forEach(a => {
+          if ('exec' in a) {
+            a.exec(send);
+          } else {
+            a(send);
+          }
+        });
+      }
+    };
+  }, []);
 
   useEffect(() => {
     state.activities.start.forEach(a => a.start(send));
@@ -53,10 +69,10 @@ const useStatechart = <C, E extends Event>(
     });
 
     if (opts.clear) console.clear();
-    if (opts.trace) trace(eventRef.current, prevStateRef.current, state);
+    if (opts.trace) trace(eventRef.current, stateRef.current, state);
     if (opts.inspect) inspect(statechart, state);
 
-    prevStateRef.current = state;
+    stateRef.current = state;
   }, [state]);
 
   return [state, send];
