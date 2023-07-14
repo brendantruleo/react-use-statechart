@@ -9,18 +9,17 @@
     "package.json",
     "/build"
   ],
-  "dependencies": {},
   "peerDependencies": {
     "@corey.burrows/statechart": "*",
-    "react": "^16.8.0 || ^17.0.0"
+    "react": ">=16.8.0 <19.0.0"
   },
   "devDependencies": {
     "@corey.burrows/statechart": "^0.2.0",
-    "@types/react": "^17.0.39",
-    "@types/react-dom": "^17.0.13",
+    "@types/react": "^18.2.15",
+    "@types/react-dom": "^18.2.7",
     "parcel": "^2.3.2",
-    "react": "^17.0.2",
-    "react-dom": "^17.0.2",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
     "typescript": "^4.5.5"
   },
   "scripts": {
