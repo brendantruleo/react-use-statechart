@@ -1,5 +1,5 @@
-import {useCallback, useEffect, useRef, useState} from 'react';
-import Statechart, {Event, State, SendFn} from '@corey.burrows/statechart';
+import { useCallback, useEffect, useRef, useState } from "react";
+import Statechart, { Event, State, SendFn } from "@corey.burrows/statechart";
 
 export interface UseStatechartOpts {
   trace?: boolean;
@@ -9,7 +9,7 @@ export interface UseStatechartOpts {
 
 const inspect = (
   statechart: Statechart<any, any>,
-  state: State<any, any>,
+  state: State<any, any>
 ): void => {
   console.info(statechart.inspect(state));
 };
@@ -17,17 +17,17 @@ const inspect = (
 const trace = (
   event: Event | null,
   from: State<any, any> | null,
-  to: State<any, any>,
+  to: State<any, any>
 ): void => {
-  const e = event ? event.type : '__init__';
-  const f = from ? JSON.stringify(from.current.map(n => n.path)) : '(null)';
-  const t = JSON.stringify(to.current.map(n => n.path));
+  const e = event ? event.type : "__init__";
+  const f = from ? JSON.stringify(from.current.map((n) => n.path)) : "(null)";
+  const t = JSON.stringify(to.current.map((n) => n.path));
   console.info(`[${e}]: ${f} -> ${t}`);
 };
 
 const useStatechart = <C, E extends Event>(
   statechart: Statechart<C, E>,
-  opts: UseStatechartOpts = {},
+  opts: UseStatechartOpts = {}
 ): [State<C, E>, SendFn<E>] => {
   const [state, setState] = useState(statechart.initialState);
   const eventRef = useRef<Event | null>(null);
@@ -36,18 +36,35 @@ const useStatechart = <C, E extends Event>(
   const send = useCallback(
     (evt: E): void => {
       eventRef.current = evt;
-      setState(state => statechart.send(state, evt));
+      setState((state) => {
+        state.activities.start.forEach((a) => a.start(send));
+        state.activities.stop.forEach((a) => a.stop());
+        state.actions.forEach((a) => {
+          if ("exec" in a) {
+            a.exec(send);
+          } else {
+            a(send);
+          }
+        });
+
+        if (opts.clear) console.clear();
+        if (opts.trace) trace(eventRef.current, stateRef.current, state);
+        if (opts.inspect) inspect(statechart, state);
+
+        stateRef.current = state;
+        return statechart.send(state, evt);
+      });
     },
-    [setState],
+    [setState]
   );
 
   useEffect(() => {
     return () => {
       if (stateRef.current) {
         const nextState = statechart.stop(stateRef.current);
-        nextState.activities.stop.forEach(a => a.stop());
-        nextState.actions.forEach(a => {
-          if ('exec' in a) {
+        nextState.activities.stop.forEach((a) => a.stop());
+        nextState.actions.forEach((a) => {
+          if ("exec" in a) {
             a.exec(send);
           } else {
             a(send);
@@ -56,24 +73,6 @@ const useStatechart = <C, E extends Event>(
       }
     };
   }, []);
-
-  useEffect(() => {
-    state.activities.start.forEach(a => a.start(send));
-    state.activities.stop.forEach(a => a.stop());
-    state.actions.forEach(a => {
-      if ('exec' in a) {
-        a.exec(send);
-      } else {
-        a(send);
-      }
-    });
-
-    if (opts.clear) console.clear();
-    if (opts.trace) trace(eventRef.current, stateRef.current, state);
-    if (opts.inspect) inspect(statechart, state);
-
-    stateRef.current = state;
-  }, [state]);
 
   return [state, send];
 };
