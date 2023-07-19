@@ -37,6 +37,7 @@ const useStatechart = <C, E extends Event>(
     (evt: E): void => {
       eventRef.current = evt;
       setState((state) => {
+        statechart.send(state, evt);
         state.activities.start.forEach((a) => a.start(send));
         state.activities.stop.forEach((a) => a.stop());
         state.actions.forEach((a) => {
@@ -52,7 +53,7 @@ const useStatechart = <C, E extends Event>(
         if (opts.inspect) inspect(statechart, state);
 
         stateRef.current = state;
-        return statechart.send(state, evt);
+        return state;
       });
     },
     [setState]
