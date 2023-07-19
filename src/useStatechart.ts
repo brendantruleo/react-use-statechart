@@ -37,10 +37,10 @@ const useStatechart = <C, E extends Event>(
     (evt: E): void => {
       eventRef.current = evt;
       setState((state) => {
-        statechart.send(state, evt);
-        state.activities.start.forEach((a) => a.start(send));
-        state.activities.stop.forEach((a) => a.stop());
-        state.actions.forEach((a) => {
+        const s = statechart.send(state, evt);
+        s.activities.start.forEach((a) => a.start(send));
+        s.activities.stop.forEach((a) => a.stop());
+        s.actions.forEach((a) => {
           if ("exec" in a) {
             a.exec(send);
           } else {
@@ -49,11 +49,11 @@ const useStatechart = <C, E extends Event>(
         });
 
         if (opts.clear) console.clear();
-        if (opts.trace) trace(eventRef.current, stateRef.current, state);
-        if (opts.inspect) inspect(statechart, state);
+        if (opts.trace) trace(eventRef.current, stateRef.current, s);
+        if (opts.inspect) inspect(statechart, s);
 
-        stateRef.current = state;
-        return state;
+        stateRef.current = s;
+        return s;
       });
     },
     [setState]
